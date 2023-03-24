@@ -53,7 +53,7 @@ contract ERC4626Extension is ERC20Extension {
     function deposit(uint256 assets, address receiver) public returns (uint256) {
         ERC4626Storage.Data storage data = ERC4626Storage.erc4626Storage();
         (uint256 shares,) = depositController.onDeposit(msg.sender, assets, receiver);
-        mint(msg.sender, shares);
+        _mint(msg.sender, shares);
         data.asset.transferFrom(msg.sender, address(this), assets);
         emit Deposit(msg.sender, receiver, assets, shares);
     }
