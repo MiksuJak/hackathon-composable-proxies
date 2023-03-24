@@ -11,9 +11,6 @@ contract ERC4626Extension is ERC20Extension {
     event Deposit(address indexed sender, address indexed owner, uint256 assets, uint256 shares);
 
     event Withdraw(address indexed sender, address indexed receiver, address indexed owner, uint256 assets, uint256 shares);
-
-    IDepositController depositController = IDepositController(address(this));
-    IWithdrawController withdrawController = IWithdrawController(address(this));
     
     function ERC4626__init(
         string calldata _name,
