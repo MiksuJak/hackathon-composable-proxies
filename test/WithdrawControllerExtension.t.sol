@@ -11,14 +11,8 @@ contract WithdrawControllerExtensionTest is Test, WithdrawControllerExtensionSet
     SimpleRouter public router;
 
     function setUp() public {
-
-        /* ERC4626 extension */
-
-        /* portfolio extension */
-
         IExtension.Extension[] memory extensions = new IExtension.Extension[](1);
         extensions[0] = setupWithdrawControllerExtension();
-
         router = new SimpleRouter(extensions);
     }
 }
