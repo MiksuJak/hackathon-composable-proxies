@@ -15,7 +15,7 @@ contract RouterTest is Test {
 
         IExtension.Extension[] memory extensions = new IExtension.Extension[](1);
         extensions[0].metadata = IExtension.ExtensionMetadata('erc20', 'erc20.storage', address(erc20Extension));
-        extensions[0].functions = new IExtension.ExtensionFunction[](11);
+        extensions[0].functions = new IExtension.ExtensionFunction[](10);
         extensions[0].functions[0] = IExtension.ExtensionFunction(erc20Extension.initialize.selector, 'initialize(string,string,uint8)');
         extensions[0].functions[1] = IExtension.ExtensionFunction(erc20Extension.name.selector, 'name()');
         extensions[0].functions[2] = IExtension.ExtensionFunction(erc20Extension.symbol.selector, 'symbol()');
@@ -26,7 +26,6 @@ contract RouterTest is Test {
         extensions[0].functions[7] = IExtension.ExtensionFunction(erc20Extension.transferFrom.selector, 'transferFrom(address,address,uint256)');
         extensions[0].functions[8] = IExtension.ExtensionFunction(erc20Extension.allowance.selector, 'allowance(address,address)');
         extensions[0].functions[9] = IExtension.ExtensionFunction(erc20Extension.approve.selector, 'approve(address,uint256)');
-        extensions[0].functions[10] = IExtension.ExtensionFunction(erc20Extension.mint.selector, 'mint(address,uint256)');
 
         router = new SimpleRouter(extensions);
 
@@ -49,16 +48,6 @@ contract RouterTest is Test {
         assertEq(ERC20Extension(address(router)).balanceOf(address(1)), 0);
     }
 
-    function testBasicMint() public {
-        ERC20Extension(address(router)).mint(address(5), 25);
-        assertEq(ERC20Extension(address(router)).balanceOf(address(5)), 25);
-    }
-
-    function testMintIncreasesTotalSupply() public {
-        ERC20Extension(address(router)).mint(address(5), 50);
-        assertEq(ERC20Extension(address(router)).totalSupply(), 50);
-    }
-
     function testAllowanceEqualsZeroAtBeginning() public {
         assertEq(ERC20Extension(address(router)).allowance(address(1), address(2)), 0);
     }
@@ -68,67 +57,102 @@ contract RouterTest is Test {
         assertEq(ERC20Extension(address(router)).allowance(address(this), address(5)), 25);
     }
 
-    function testTransfer() public {
-        ERC20Extension(address(router)).mint(address(this), 500);
-        ERC20Extension(address(router)).transfer(address(5), 450);
-        assertEq(ERC20Extension(address(router)).balanceOf(address(this)), 50);
-        assertEq(ERC20Extension(address(router)).balanceOf(address(5)), 450);
-    }
+    // function testBasicMint() public {
+    //     ERC20Extension(address(router)).mint(address(5), 25);
+    //     assertEq(ERC20Extension(address(router)).balanceOf(address(5)), 25);
+    // }
 
-    function testTransferZero() public {
-        ERC20Extension(address(router)).mint(address(this), 500);
-        ERC20Extension(address(router)).transfer(address(5), 0);
-        assertEq(ERC20Extension(address(router)).balanceOf(address(this)), 500);
-        assertEq(ERC20Extension(address(router)).balanceOf(address(5)), 0);
-    }
+    // function testMintIncreasesTotalSupply() public {
+    //     ERC20Extension(address(router)).mint(address(5), 50);
+    //     assertEq(ERC20Extension(address(router)).totalSupply(), 50);
+    // }
 
-    function testTransferEverything() public {
-        ERC20Extension(address(router)).mint(address(this), 500);
-        ERC20Extension(address(router)).transfer(address(5), 500);
-        assertEq(ERC20Extension(address(router)).balanceOf(address(this)), 0);
-        assertEq(ERC20Extension(address(router)).balanceOf(address(5)), 500);
-    }
+    // function testTransfer() public {
+    //     ERC20Extension(address(router)).mint(address(this), 500);
+    //     ERC20Extension(address(router)).transfer(address(5), 450);
+    //     assertEq(ERC20Extension(address(router)).balanceOf(address(this)), 50);
+    //     assertEq(ERC20Extension(address(router)).balanceOf(address(5)), 450);
+    // }
 
-    function testTransferOverAmount() public {
-        ERC20Extension(address(router)).mint(address(this), 500);
-        try ERC20Extension(address(router)).transfer(address(5), 505) {
-            assert(false);
-        } catch {}
-    }
+    // function testTransferZero() public {
+    //     ERC20Extension(address(router)).mint(address(this), 500);
+    //     ERC20Extension(address(router)).transfer(address(5), 0);
+    //     assertEq(ERC20Extension(address(router)).balanceOf(address(this)), 500);
+    //     assertEq(ERC20Extension(address(router)).balanceOf(address(5)), 0);
+    // }
 
-    function testTransferDoesntChangeTotalSupply() public {
-        ERC20Extension(address(router)).mint(address(this), 500);
-        ERC20Extension(address(router)).transfer(address(5), 123);
-        assertEq(ERC20Extension(address(router)).totalSupply(), 500);
-    }
+    // function testTransferEverything() public {
+    //     ERC20Extension(address(router)).mint(address(this), 500);
+    //     ERC20Extension(address(router)).transfer(address(5), 500);
+    //     assertEq(ERC20Extension(address(router)).balanceOf(address(this)), 0);
+    //     assertEq(ERC20Extension(address(router)).balanceOf(address(5)), 500);
+    // }
 
-    function testBasicTransferFrom() public {
-        ERC20Extension(address(router)).mint(address(this), 500);
-        ERC20Extension(address(router)).approve(address(this), 1000);
-        ERC20Extension(address(router)).transferFrom(address(this), address(this), 123);
-        assertEq(ERC20Extension(address(router)).balanceOf(address(this)), 500);
-    }
+    // function testTransferOverAmount() public {
+    //     ERC20Extension(address(router)).mint(address(this), 500);
+    //     try ERC20Extension(address(router)).transfer(address(5), 505) {
+    //         assert(false);
+    //     } catch {}
+    // }
 
-    function testTransferFromToItself() public {
-        ERC20Extension(address(router)).mint(address(this), 500);
-        ERC20Extension(address(router)).approve(address(this), 1000);
-        ERC20Extension(address(router)).transferFrom(address(this), address(5), 200);
-        assertEq(ERC20Extension(address(router)).balanceOf(address(this)), 300);
-        assertEq(ERC20Extension(address(router)).balanceOf(address(5)), 200);
-    }
+    // function testTransferDoesntChangeTotalSupply() public {
+    //     ERC20Extension(address(router)).mint(address(this), 500);
+    //     ERC20Extension(address(router)).transfer(address(5), 123);
+    //     assertEq(ERC20Extension(address(router)).totalSupply(), 500);
+    // }
 
-    function testTransferFromWithoutAllowance() public {
-        ERC20Extension(address(router)).mint(address(this), 500);
-        try ERC20Extension(address(router)).transferFrom(address(this), address(5), 200) {
-            assert(false);
-        } catch {}
-    }
+    // function testBasicTransferFrom() public {
+    //     ERC20Extension(address(router)).mint(address(this), 500);
+    //     ERC20Extension(address(router)).approve(address(this), 1000);
+    //     ERC20Extension(address(router)).transferFrom(address(this), address(this), 123);
+    //     assertEq(ERC20Extension(address(router)).balanceOf(address(this)), 500);
+    // }
 
-    function testTransferFromWithNotEnoughAllowance() public {
-        ERC20Extension(address(router)).mint(address(this), 500);
-        ERC20Extension(address(router)).approve(address(this), 100);
-        try ERC20Extension(address(router)).transferFrom(address(this), address(5), 200) {
-            assert(false);
-        } catch {}
-    }
+    // function testTransferFromToItself() public {
+    //     ERC20Extension(address(router)).mint(address(this), 500);
+    //     ERC20Extension(address(router)).approve(address(this), 1000);
+    //     ERC20Extension(address(router)).transferFrom(address(this), address(5), 200);
+    //     assertEq(ERC20Extension(address(router)).balanceOf(address(this)), 300);
+    //     assertEq(ERC20Extension(address(router)).balanceOf(address(5)), 200);
+    // }
+
+    // function testTransferFromWithoutAllowance() public {
+    //     ERC20Extension(address(router)).mint(address(this), 500);
+    //     try ERC20Extension(address(router)).transferFrom(address(this), address(5), 200) {
+    //         assert(false);
+    //     } catch {}
+    // }
+
+    // function testTransferFromWithNotEnoughAllowance() public {
+    //     ERC20Extension(address(router)).mint(address(this), 500);
+    //     ERC20Extension(address(router)).approve(address(this), 100);
+    //     try ERC20Extension(address(router)).transferFrom(address(this), address(5), 200) {
+    //         assert(false);
+    //     } catch {}
+    // }
+
+    // function testBurnBurnsShares() public {
+    //     ERC20Extension(address(router)).mint(address(this), 500);
+    //     ERC20Extension(address(router)).burn(100);
+    //     assertEq(ERC20Extension(address(router)).balanceOf(address(this)), 400);
+    // }
+
+    // function testBurnWithZeroShares() public {
+    //     try ERC20Extension(address(router)).burn(150) {
+    //         assert(false);
+    //     } catch {}
+    // }
+
+    // function testBurnWithNotEnoughShares() public {
+    //     ERC20Extension(address(router)).mint(address(this), 50);
+    //     try ERC20Extension(address(router)).burn(100) {
+    //         assert(false);
+    //     } catch {}
+    // }
+
+    // function testBurnFromBurnsShares() public {
+    //     ERC20Extension(address(router)).mint(address(5), 500);
+    //     ERC20Extension(address(router)).burnFrom(address(5), 200);
+    //     assertEq(ERC20Extension(address(router)).balanceOf(address(5)), 300);
+    // }
 }

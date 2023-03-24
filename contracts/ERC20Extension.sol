@@ -63,10 +63,25 @@ contract ERC20Extension is IERC20 {
         return true;
     }
 
-    function mint(address owner, uint256 value) public {
+    function _mint(address owner, uint256 amount) internal {
         ERC4626Storage.Data storage data = ERC4626Storage.erc4626Storage();
-        data.balances[owner] += value;
-        data.totalSupply += value;
+        require(type(uint256).max - amount > data.balances[owner], "uint overflow in mint");
+        data.balances[owner] += amount;
+        data.totalSupply += amount;
+    }
+
+    function _burn(uint256 amount) internal {
+        ERC4626Storage.Data storage data = ERC4626Storage.erc4626Storage();
+        require(data.balances[msg.sender] >= amount, "Not enough shares to burn");
+        data.balances[msg.sender] -= amount;
+        data.totalSupply -= amount;
+    }
+
+    function _burnFrom(address owner, uint256 amount) internal {
+        ERC4626Storage.Data storage data = ERC4626Storage.erc4626Storage();
+        require(data.balances[owner] >= amount, "Not enough shares to burn");
+        data.balances[owner] -= amount;
+        data.totalSupply -= amount;
     }
 
     function _transfer(
