@@ -3,7 +3,7 @@ pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
 import "contracts/Router.sol";
-import "contracts/DepositControllerExtension.sol";
+import "contracts/controllers/DepositControllerExtension.sol";
 import "contracts/Extension.sol";
 import "@dynamic-contracts/interface/IExtension.sol";
 
@@ -18,7 +18,7 @@ contract RouterTest is Test {
         /* portfolio extension */
 
         DepositControllerExtension depositController = new DepositControllerExtension();
-        extensions[0].medatada = IExtension.ExtensionMetadata('depositController', 'null.storage', address(depositController));
+        extensions[0].metadata = IExtension.ExtensionMetadata('depositController', 'null.storage', address(depositController));
         extensions[0].functions = new IExtension.ExtensionFunction[](6);
         extensions[0].functions[0] = IExtension.ExtensionFunction(depositController.onDeposit.selector, 'onDeposit(address,uint256,address)');
         extensions[0].functions[1] = IExtension.ExtensionFunction(depositController.onMint.selector, 'onMint(address,uint256,address)');
