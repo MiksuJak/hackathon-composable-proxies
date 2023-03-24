@@ -4,7 +4,6 @@ pragma solidity ^0.8.13;
 import "forge-std/Test.sol";
 import "contracts/Router.sol";
 import "contracts/controllers/DepositControllerExtension.sol";
-import "contracts/Extension.sol";
 import "@dynamic-contracts/interface/IExtension.sol";
 
 contract RouterTest is Test {
