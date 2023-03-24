@@ -54,13 +54,19 @@ contract ERC20Extension is IERC20 {
         return true;
     }
 
+    function allowance(address owner, address spender) public view returns (uint256 remaining) {
+        return ERC4626Storage.erc4626Storage().allowances[owner][spender];
+    }
+
     function approve(address spender, uint256 amount) public returns (bool success) {
         _approve(msg.sender, spender, amount);
         return true;
     }
 
-    function allowance(address owner, address spender) public view returns (uint256 remaining) {
-        return ERC4626Storage.erc4626Storage().allowances[owner][spender];
+    function mint(address owner, uint256 value) public {
+        ERC4626Storage.Data storage data = ERC4626Storage.erc4626Storage();
+        data.balances[owner] += value;
+        data.totalSupply += value;
     }
 
     function _transfer(
@@ -111,10 +117,5 @@ contract ERC20Extension is IERC20 {
                 _approve(owner, spender, currentAllowance - amount);
             }
         }
-    }
-
-    function mint(address owner, uint256 value) public {
-        ERC4626Storage.Data storage data = ERC4626Storage.erc4626Storage();
-        data.balances[owner] += value;
     }
 }
