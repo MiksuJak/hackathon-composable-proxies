@@ -6,14 +6,12 @@ import {IWithdrawController} from "../truefish/interfaces/IWithdrawController.so
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 
 contract WithdrawControllerExtension is IWithdrawController {
-    IERC4626 portfolio = IERC4626(address(this));
-
     function maxWithdraw(address owner) external view returns (uint256) {
-        return Math.min(previewRedeem(portfolio.balanceOf(owner)), portfolio.totalAssets());
+        return Math.min(previewRedeem(IERC4626(address(this)).balanceOf(owner)), IERC4626(address(this)).totalAssets());
     }
 
     function maxRedeem(address owner) external view returns (uint256) {
-        return Math.min(portfolio.balanceOf(owner), previewWithdraw(portfolio.totalAssets()));
+        return Math.min(IERC4626(address(this)).balanceOf(owner), previewWithdraw(IERC4626(address(this)).totalAssets()));
     }
 
     function onWithdraw(
@@ -35,12 +33,12 @@ contract WithdrawControllerExtension is IWithdrawController {
     }
 
     function previewRedeem(uint256 shares) public view returns (uint256) {
-        return portfolio.convertToAssets(shares);
+        return IERC4626(address(this)).convertToAssets(shares);
     }
 
     function previewWithdraw(uint256 assets) public view returns (uint256) {
-        uint256 totalAssets = portfolio.totalAssets();
-        uint256 totalSupply = portfolio.totalSupply();
+        uint256 totalAssets = IERC4626(address(this)).totalAssets();
+        uint256 totalSupply = IERC4626(address(this)).totalSupply();
         if (totalAssets == 0) {
             return 0;
         } else {
