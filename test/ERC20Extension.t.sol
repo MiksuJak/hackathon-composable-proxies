@@ -29,7 +29,7 @@ contract ERC20ExtensionTest is Test {
 
         router = new SimpleRouter(extensions);
 
-        ERC20Extension(address(router)).initialize("ERC20Test", "E20T", 6);
+        ERC20Extension(address(router)).ERC20__init("ERC20Test", "E20T", 6);
     }
 
     function testBasicInitialize() public {
