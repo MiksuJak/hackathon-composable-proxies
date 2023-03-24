@@ -12,6 +12,7 @@ contract ERC20Extension is IERC20 {
     ) public {
         ERC20Storage.Data storage data = ERC20Storage.erc20Storage();
         require(!data.initialized, "Already initialized");
+
         data.name = _name;
         data.symbol = _symbol;
         data.decimals = _decimals;
@@ -22,37 +23,55 @@ contract ERC20Extension is IERC20 {
         return ERC20Storage.erc20Storage().name;
     }
 
-    function symbol() public view returns (string memory){
+    function symbol() public view returns (string memory) {
         return ERC20Storage.erc20Storage().symbol;
     }
 
-    function decimals() public view returns (uint8){
+    function decimals() public view returns (uint8) {
         return ERC20Storage.erc20Storage().decimals;
     }
 
-    function totalSupply() public view returns (uint256){
+    function totalSupply() public view returns (uint256) {
         return ERC20Storage.erc20Storage().totalSupply;
     }
 
-    function balanceOf(address _owner) public view returns (uint256 balance) {
-        return ERC20Storage.erc20Storage().balances[_owner];
+    function balanceOf(address owner) public view returns (uint256 balance) {
+        return ERC20Storage.erc20Storage().balances[owner];
     }
 
-    function mint(address _owner, uint256 value) public {
-        ERC20Storage.Data storage data = ERC20Storage.erc20Storage();
-        data.balances[_owner] += value;
+    function transfer(address to, uint256 amount) public returns (bool success) {
+        _transfer(msg.sender, to, amount);
+        return true;
     }
 
+    function transferFrom(
+        address from, 
+        address to, 
+        uint256 amount
+    ) public returns (bool success) {
+        _spendAllowance(from, msg.sender, amount);
+        _transfer(from, to, amount);
+        return true;
+    }
+
+    function approve(address spender, uint256 amount) public returns (bool success) {
+        _approve(msg.sender, spender, amount);
+        return true;
+    }
+
+    function allowance(address owner, address spender) public view returns (uint256 remaining) {
+        return ERC20Storage.erc20Storage().allowances[owner][spender];
+    }
 
     function _transfer(
         address from,
         address to,
         uint256 amount
     ) internal virtual {
-        ERC20Storage.Data storage data = ERC20Storage.erc20Storage();
-
         require(from != address(0), "ERC20: transfer from the zero address");
         require(to != address(0), "ERC20: transfer to the zero address");
+
+        ERC20Storage.Data storage data = ERC20Storage.erc20Storage();
 
         uint256 fromBalance = data.balances[from];
         require(fromBalance >= amount, "ERC20: transfer amount exceeds balance");
@@ -66,17 +85,36 @@ contract ERC20Extension is IERC20 {
         emit Transfer(from, to, amount);
     }
 
-    function transfer(address _to, uint256 _value) public returns (bool success){
-        _transfer(msg.sender, _to, _value);
-        return true;
+    function _approve(
+        address owner,
+        address spender,
+        uint256 amount
+    ) internal virtual {
+        require(owner != address(0), "ERC20: approve from the zero address");
+        require(spender != address(0), "ERC20: approve to the zero address");
+
+        ERC20Storage.Data storage data = ERC20Storage.erc20Storage();
+
+        data.allowances[owner][spender] = amount;
+        emit Approval(owner, spender, amount);
     }
-    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success){
-        return  false;
+
+    function _spendAllowance(
+        address owner,
+        address spender,
+        uint256 amount
+    ) internal virtual {
+        uint256 currentAllowance = allowance(owner, spender);
+        if (currentAllowance != type(uint256).max) {
+            require(currentAllowance >= amount, "ERC20: insufficient allowance");
+            unchecked {
+                _approve(owner, spender, currentAllowance - amount);
+            }
+        }
     }
-    function approve(address _spender, uint256 _value) public returns (bool success){
-        return  false;
-    }
-    function allowance(address _owner, address _spender) public view returns (uint256 remaining){
-        return  0;
+
+    function mint(address owner, uint256 value) public {
+        ERC20Storage.Data storage data = ERC20Storage.erc20Storage();
+        data.balances[owner] += value;
     }
 }
