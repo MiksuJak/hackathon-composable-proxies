@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.10;
 
-import {IPortfolio} from "../interfaces/IPortfolio.sol";
+import {IERC4626} from "../interfaces/IERC4626.sol";
 import {IWithdrawController} from "../interfaces/IWithdrawController.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
@@ -10,13 +10,13 @@ contract WithdrawController is IWithdrawController, Initializable {
     function initialize() external initializer {}
 
     function maxWithdraw(address owner) external view returns (uint256) {
-        IPortfolio portfolio = IPortfolio(msg.sender);
-        return Math.min(previewRedeem(portfolio.balanceOf(owner)), portfolio.liquidAssets());
+        IERC4626 portfolio = IERC4626(msg.sender);
+        return Math.min(previewRedeem(portfolio.balanceOf(owner)), portfolio.totalAssets());
     }
 
     function maxRedeem(address owner) external view returns (uint256) {
-        IPortfolio portfolio = IPortfolio(msg.sender);
-        return Math.min(portfolio.balanceOf(owner), previewWithdraw(portfolio.liquidAssets()));
+        IERC4626 portfolio = IERC4626(msg.sender);
+        return Math.min(portfolio.balanceOf(owner), previewWithdraw(portfolio.totalAssets()));
     }
 
     function onWithdraw(
@@ -38,12 +38,12 @@ contract WithdrawController is IWithdrawController, Initializable {
     }
 
     function previewRedeem(uint256 shares) public view returns (uint256) {
-        return IPortfolio(msg.sender).convertToAssets(shares);
+        return IERC4626(msg.sender).convertToAssets(shares);
     }
 
     function previewWithdraw(uint256 assets) public view returns (uint256) {
-        uint256 totalAssets = IPortfolio(msg.sender).totalAssets();
-        uint256 totalSupply = IPortfolio(msg.sender).totalSupply();
+        uint256 totalAssets = IERC4626(msg.sender).totalAssets();
+        uint256 totalSupply = IERC4626(msg.sender).totalSupply();
         if (totalAssets == 0) {
             return 0;
         } else {
