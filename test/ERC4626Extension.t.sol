@@ -19,7 +19,7 @@ contract ERC4626ExtensionTest is Test {
 
         IExtension.Extension[] memory extensions = new IExtension.Extension[](1);
         extensions[0].metadata = IExtension.ExtensionMetadata('erc4626', 'erc4626.storage', address(erc4626Extension));
-        extensions[0].functions = new IExtension.ExtensionFunction[](12);
+        extensions[0].functions = new IExtension.ExtensionFunction[](11);
         extensions[0].functions[0] = IExtension.ExtensionFunction(erc4626Extension.ERC4626__init.selector, 'ERC4626__init(string,string,uint8,address)');
         extensions[0].functions[1] = IExtension.ExtensionFunction(erc4626Extension.name.selector, 'name()');
         extensions[0].functions[2] = IExtension.ExtensionFunction(erc4626Extension.symbol.selector, 'symbol()');
@@ -30,8 +30,7 @@ contract ERC4626ExtensionTest is Test {
         extensions[0].functions[7] = IExtension.ExtensionFunction(erc4626Extension.transferFrom.selector, 'transferFrom(address,address,uint256)');
         extensions[0].functions[8] = IExtension.ExtensionFunction(erc4626Extension.allowance.selector, 'allowance(address,address)');
         extensions[0].functions[9] = IExtension.ExtensionFunction(erc4626Extension.approve.selector, 'approve(address,uint256)');
-        extensions[0].functions[10] = IExtension.ExtensionFunction(erc4626Extension.mint.selector, 'mint(address,uint256)');
-        extensions[0].functions[11] = IExtension.ExtensionFunction(erc4626Extension.asset.selector, 'asset()');
+        extensions[0].functions[10] = IExtension.ExtensionFunction(erc4626Extension.asset.selector, 'asset()');
 
         router = new SimpleRouter(extensions);
 
