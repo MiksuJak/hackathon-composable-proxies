@@ -2,7 +2,7 @@
 pragma solidity ^0.8.17;
 
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import "./storages/ERC20Storage.sol";
+import "./storages/ERC4626Storage.sol";
 
 contract ERC20Extension is IERC20 {
     function initialize(
@@ -10,7 +10,7 @@ contract ERC20Extension is IERC20 {
         string calldata _symbol,
         uint8 _decimals
     ) public {
-        ERC20Storage.Data storage data = ERC20Storage.erc20Storage();
+        ERC4626Storage.Data storage data = ERC4626Storage.erc4626Storage();
         require(!data.initialized, "Already initialized");
 
         data.name = _name;
@@ -20,23 +20,23 @@ contract ERC20Extension is IERC20 {
     }
 
     function name() public view returns (string memory) {
-        return ERC20Storage.erc20Storage().name;
+        return ERC4626Storage.erc4626Storage().name;
     }
 
     function symbol() public view returns (string memory) {
-        return ERC20Storage.erc20Storage().symbol;
+        return ERC4626Storage.erc4626Storage().symbol;
     }
 
     function decimals() public view returns (uint8) {
-        return ERC20Storage.erc20Storage().decimals;
+        return ERC4626Storage.erc4626Storage().decimals;
     }
 
     function totalSupply() public view returns (uint256) {
-        return ERC20Storage.erc20Storage().totalSupply;
+        return ERC4626Storage.erc4626Storage().totalSupply;
     }
 
     function balanceOf(address owner) public view returns (uint256 balance) {
-        return ERC20Storage.erc20Storage().balances[owner];
+        return ERC4626Storage.erc4626Storage().balances[owner];
     }
 
     function transfer(address to, uint256 amount) public returns (bool success) {
@@ -60,7 +60,7 @@ contract ERC20Extension is IERC20 {
     }
 
     function allowance(address owner, address spender) public view returns (uint256 remaining) {
-        return ERC20Storage.erc20Storage().allowances[owner][spender];
+        return ERC4626Storage.erc4626Storage().allowances[owner][spender];
     }
 
     function _transfer(
@@ -71,7 +71,7 @@ contract ERC20Extension is IERC20 {
         require(from != address(0), "ERC20: transfer from the zero address");
         require(to != address(0), "ERC20: transfer to the zero address");
 
-        ERC20Storage.Data storage data = ERC20Storage.erc20Storage();
+        ERC4626Storage.Data storage data = ERC4626Storage.erc4626Storage();
 
         uint256 fromBalance = data.balances[from];
         require(fromBalance >= amount, "ERC20: transfer amount exceeds balance");
@@ -93,7 +93,7 @@ contract ERC20Extension is IERC20 {
         require(owner != address(0), "ERC20: approve from the zero address");
         require(spender != address(0), "ERC20: approve to the zero address");
 
-        ERC20Storage.Data storage data = ERC20Storage.erc20Storage();
+        ERC4626Storage.Data storage data = ERC4626Storage.erc4626Storage();
 
         data.allowances[owner][spender] = amount;
         emit Approval(owner, spender, amount);
@@ -114,7 +114,7 @@ contract ERC20Extension is IERC20 {
     }
 
     function mint(address owner, uint256 value) public {
-        ERC20Storage.Data storage data = ERC20Storage.erc20Storage();
+        ERC4626Storage.Data storage data = ERC4626Storage.erc4626Storage();
         data.balances[owner] += value;
     }
 }

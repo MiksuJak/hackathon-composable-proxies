@@ -31,4 +31,9 @@ contract RouterTest is Test {
     function testName() public {
         assertEq(ERC20Extension(address(router)).name(), "ERC20Test");
     }
+
+    function testMint() public {
+        ERC20Extension(address(router)).mint(address(5), 25);
+        assertEq(ERC20Extension(address(router)).balanceOf(address(5)), 25);
+    }
 }
