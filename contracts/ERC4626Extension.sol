@@ -23,7 +23,7 @@ contract ERC4626Extension is ERC20Extension {
         data.asset = _asset;
     }
 
-    function asset() public view returns (IERC20Metadata asset) {
+    function asset() public view returns (IERC20Metadata _asset) {
         return ERC4626Storage.erc4626Storage().asset;
     }
 
@@ -32,19 +32,19 @@ contract ERC4626Extension is ERC20Extension {
     }
 
     function convertToShares(uint256 assets) public view returns (uint256 shares) {
-        uint256 totalAssets = totalAssets();
-        if (totalAssets == 0) {
+        uint256 _totalAssets = totalAssets();
+        if (_totalAssets == 0) {
             return assets;
         }
-        return (assets * totalSupply()) / totalAssets;
+        return (assets * totalSupply()) / _totalAssets;
     }
 
     function convertToAssets(uint256 shares) public view returns (uint256 assets) {
-        uint256 totalAssets = totalAssets();
-        if (totalAssets == 0) {
+        uint256 _totalAssets = totalAssets();
+        if (_totalAssets == 0) {
             return shares;
         }
-        return (shares * totalAssets) / totalSupply();
+        return (shares * _totalAssets) / totalSupply();
     }
 
     function deposit(uint256 assets, address receiver) public returns (uint256) {
@@ -53,25 +53,41 @@ contract ERC4626Extension is ERC20Extension {
         _mint(msg.sender, shares);
         data.asset.transferFrom(msg.sender, address(this), assets);
         emit Deposit(msg.sender, receiver, assets, shares);
+        return shares;
     }
 
-    // function mint(uint256 shares, address receiver) public returns (uint256 assets) {
-    //     return 0;
-    // }
+    function mint(uint256 shares, address receiver) public returns (uint256) {
+        ERC4626Storage.Data storage data = ERC4626Storage.erc4626Storage();
+        (uint256 assets,) = IDepositController(address(this)).onMint(msg.sender, shares, receiver);
+        _mint(msg.sender, shares);
+        data.asset.transferFrom(msg.sender, address(this), assets);
+        emit Deposit(msg.sender, receiver, assets, shares);
+        return assets;
+    }
 
     function withdraw(
         uint256 assets,
         address receiver,
         address owner
     ) public returns (uint256) {
-        return 0;
+        ERC4626Storage.Data storage data = ERC4626Storage.erc4626Storage();
+        (uint256 shares,) = IWithdrawController(address(this)).onWithdraw(msg.sender, assets, receiver, owner);
+        _burnFrom(msg.sender, shares);
+        data.asset.transferFrom(address(this), msg.sender, assets);
+        emit Withdraw(msg.sender, receiver, owner, assets, shares);
+        return shares;
     }
 
     function redeem(
         uint256 shares,
         address receiver,
         address owner
-    ) public returns (uint256 assets) {
-        return 0;
+    ) public returns (uint256) {
+        ERC4626Storage.Data storage data = ERC4626Storage.erc4626Storage();
+        (uint256 assets,) = IWithdrawController(address(this)).onRedeem(msg.sender, shares, receiver, owner);
+        _burnFrom(msg.sender, shares);
+        data.asset.transferFrom(address(this), msg.sender, assets);
+        emit Withdraw(msg.sender, receiver, owner, assets, shares);
+        return assets;
     }
 }
