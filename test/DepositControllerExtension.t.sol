@@ -18,14 +18,14 @@ contract RouterTest is Test {
         /* portfolio extension */
 
         DepositControllerExtension depositController = new DepositControllerExtension();
-        extensions[2].medatada = IExtension.ExtensionMetadata('depositController', 'null.storage', address(depositController));
-        extensions[2].functions = new IExtension.ExtensionFunction[](6);
-        extensions[2].functions[0] = IExtension.ExtensionFunction(depositController.onDeposit.selector, 'onDeposit(address,uint256,address)');
-        extensions[2].functions[1] = IExtension.ExtensionFunction(depositController.onMint.selector, 'onMint(address,uint256,address)');
-        extensions[2].functions[2] = IExtension.ExtensionFunction(depositController.previewDeposit.selector, 'previewDeposit(uint256)');
-        extensions[2].functions[3] = IExtension.ExtensionFunction(depositController.previewMint.selector, 'previewMint(uint256)');
-        extensions[2].functions[4] = IExtension.ExtensionFunction(depositController.maxDeposit.selector, 'maxDeposit(address)');
-        extensions[2].functions[5] = IExtension.ExtensionFunction(depositController.maxMint.selector, 'maxMint(address)');
+        extensions[0].medatada = IExtension.ExtensionMetadata('depositController', 'null.storage', address(depositController));
+        extensions[0].functions = new IExtension.ExtensionFunction[](6);
+        extensions[0].functions[0] = IExtension.ExtensionFunction(depositController.onDeposit.selector, 'onDeposit(address,uint256,address)');
+        extensions[0].functions[1] = IExtension.ExtensionFunction(depositController.onMint.selector, 'onMint(address,uint256,address)');
+        extensions[0].functions[2] = IExtension.ExtensionFunction(depositController.previewDeposit.selector, 'previewDeposit(uint256)');
+        extensions[0].functions[3] = IExtension.ExtensionFunction(depositController.previewMint.selector, 'previewMint(uint256)');
+        extensions[0].functions[4] = IExtension.ExtensionFunction(depositController.maxDeposit.selector, 'maxDeposit(address)');
+        extensions[0].functions[5] = IExtension.ExtensionFunction(depositController.maxMint.selector, 'maxMint(address)');
 
         router = new SimpleRouter(extensions);
     }
