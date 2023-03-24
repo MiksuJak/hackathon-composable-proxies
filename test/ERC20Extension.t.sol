@@ -6,7 +6,7 @@ import "contracts/Router.sol";
 import "contracts/ERC20Extension.sol";
 import "@dynamic-contracts/interface/IExtension.sol";
 
-contract RouterTest is Test {
+contract ERC20ExtensionTest is Test {
     SimpleRouter public router;
 
 
@@ -16,7 +16,7 @@ contract RouterTest is Test {
         IExtension.Extension[] memory extensions = new IExtension.Extension[](1);
         extensions[0].metadata = IExtension.ExtensionMetadata('erc20', 'erc20.storage', address(erc20Extension));
         extensions[0].functions = new IExtension.ExtensionFunction[](11);
-        extensions[0].functions[0] = IExtension.ExtensionFunction(erc20Extension.initialize.selector, 'initialize(string,string,uint8)');
+        extensions[0].functions[0] = IExtension.ExtensionFunction(erc20Extension.ERC20__init.selector, 'ERC20__init(string,string,uint8)');
         extensions[0].functions[1] = IExtension.ExtensionFunction(erc20Extension.name.selector, 'name()');
         extensions[0].functions[2] = IExtension.ExtensionFunction(erc20Extension.symbol.selector, 'symbol()');
         extensions[0].functions[3] = IExtension.ExtensionFunction(erc20Extension.decimals.selector, 'decimals()');
@@ -30,7 +30,7 @@ contract RouterTest is Test {
 
         router = new SimpleRouter(extensions);
 
-        ERC20Extension(address(router)).initialize("ERC20Test", "E20T", 6);
+        ERC20Extension(address(router)).ERC20__init("ERC20Test", "E20T", 6);
     }
 
     function testBasicInitialize() public {
@@ -40,7 +40,7 @@ contract RouterTest is Test {
     }
 
     function testInitializeCanBeCalledOnlyOnce() public {
-        try ERC20Extension(address(router)).initialize("ERC20Second", "E20TT", 4) {
+        try ERC20Extension(address(router)).ERC20__init("ERC20Second", "E20TT", 4) {
             assert(false);
         } catch {}
     }

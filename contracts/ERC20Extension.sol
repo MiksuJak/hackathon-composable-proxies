@@ -5,7 +5,7 @@ import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import "./storages/ERC4626Storage.sol";
 
 contract ERC20Extension is IERC20 {
-    function initialize(
+    function ERC20__init(
         string calldata _name,
         string calldata _symbol,
         uint8 _decimals

@@ -15,19 +15,15 @@ contract ERC4626Extension is ERC20Extension {
     IDepositController depositController = IDepositController(address(this));
     IWithdrawController withdrawController = IWithdrawController(address(this));
     
-    function initialize(
+    function ERC4626__init(
         string calldata _name,
         string calldata _symbol,
         uint8 _decimals,
         IERC20Metadata _asset
     ) public {
+        ERC20__init(_name, _symbol, _decimals);
         ERC4626Storage.Data storage data = ERC4626Storage.erc4626Storage();
-        require(!data.initialized, "Already initialized");
-        data.name = _name;
-        data.symbol = _symbol;
-        data.decimals = _decimals;
         data.asset = _asset;
-        data.initialized = true;
     }
 
     function asset() public view returns (IERC20Metadata asset) {
@@ -62,9 +58,9 @@ contract ERC4626Extension is ERC20Extension {
         emit Deposit(msg.sender, receiver, assets, shares);
     }
 
-    function mint(uint256 shares, address receiver) public returns (uint256 assets) {
-        return 0;
-    }
+    // function mint(uint256 shares, address receiver) public returns (uint256 assets) {
+    //     return 0;
+    // }
 
     function withdraw(
         uint256 assets,
